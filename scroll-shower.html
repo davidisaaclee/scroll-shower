@@ -100,7 +100,6 @@
 
         var topThreshold = 30;
         if (scope.hideAtTop && (currentPosition < topThreshold)) {
-          console.log('here');
           scope._clearTimeout('down');
           scope._clearTimeout('up');
           scope._setVisible(false);
@@ -163,7 +162,6 @@
     },
 
     _setVisible: function (willBeVisible) {
-      console.log('setting visible:', willBeVisible);
       if (willBeVisible) {
         if (!(this.$.container.classList.contains('hidden') &&
               !this.$.container.classList.contains('shown'))) {
@@ -209,10 +207,7 @@
     },
 
     _progressChanged: function () {
-      // console.log('progress is', this.progress);
-
-      // console.log('tweening');
-
+      // -- this causes flickering and weirdness at top of page...
       // this._setTween();
       // var transformAmount = -Math.floor(this.progress * 100) + "%";
       // this.$.container.style['-webkit-transform'] = "translateY(" + transformAmount + ")";
