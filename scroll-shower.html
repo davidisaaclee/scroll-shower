@@ -1,0 +1,224 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="scroll-shower">
+
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+
+      position: fixed;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      top: 0;
+      width: 10%;
+      text-align: center;
+      display: block;
+    }
+
+    #container {
+      display: block;
+      padding-top: 1em;
+      width: 100%;
+
+      -webkit-transition: all 0.2s ease;
+      transition: all 0.2s ease;
+    }
+
+    .notransition {
+      -webkit-transition: none !important;
+      transition: none !important;
+    }
+
+    #container.hidden {
+      -webkit-transform: translateY(-100%);
+      transform: translateY(-100%);
+    }
+
+    #container.shown {
+      -webkit-transform: translateY(0);
+      transform: translateY(0);
+    }
+  </style>
+
+  <template>
+    <div id="container" unresolved>
+      <content></content>
+    </div>
+  </template>
+
+</dom-module>
+
+<script>
+
+  Polymer({
+
+    is: 'scroll-shower',
+
+    properties: {
+      progress: {
+        type: Number,
+        observer: '_progressChanged',
+        value: 1
+      },
+      speedFactor: {
+        type: Number,
+        value: 200
+      },
+      showTimeoutDelay: {
+        type: Number,
+        value: 100
+      },
+      hideTimeoutDelay: {
+        type: Number,
+        value: 30
+      },
+      hideAtTop: {
+        type: Boolean,
+        value: true
+      }
+    },
+
+    // Element Lifecycle
+
+    ready: function() {
+      // `ready` is called after all elements have been configured, but
+      // propagates bottom-up. This element's children are ready, but parents
+      // are not.
+      //
+      // This is the point where you should make modifications to the DOM (when
+      // necessary), or kick off any processes the element wants to perform.
+      this._setVisible(false);
+      var previousPosition = this._getScrollTop();
+      var scrollDelta = 0;
+      var scope = this;
+      document.addEventListener('scroll', function () {
+        var currentPosition = scope._getScrollTop();
+        scrollDelta = currentPosition - previousPosition;
+        previousPosition = currentPosition;
+
+        var topThreshold = 30;
+        if (scope.hideAtTop && (currentPosition < topThreshold)) {
+          console.log('here');
+          scope._clearTimeout('down');
+          scope._clearTimeout('up');
+          scope._setVisible(false);
+          return;
+        }
+
+        if (scrollDelta < 0) {
+          scope._moved(scrollDelta / scope.speedFactor, 'up');
+        } else if (scrollDelta > 0) {
+          scope._moved(scrollDelta / scope.speedFactor, 'down');
+        }
+      });
+    },
+
+    _moved: function (amount, whichWay) {
+      this._clearTimeout('down');
+      this._clearTimeout('up');
+      var newProgress = this.progress + amount;
+      if (newProgress < 0.0) {
+        this.progress = 0.0;
+      } else if (newProgress > 1.0) {
+        this.progress = 1.0;
+      } else {
+        this.progress = newProgress;
+      }
+      this._startTimeout(whichWay);
+    },
+
+    _timeoutIds: {}, // idk if this will be shared across instances?
+
+    _startTimeout: function (whichTimeout) {
+      this._setTween();
+      if (whichTimeout == 'down') {
+        this._setVisible(false);
+        // this._timeoutIds[whichTimeout] =
+        //   setTimeout(this._timedOut(whichTimeout).bind(this), this.hideTimeoutDelay);
+      } else {
+        this._timeoutIds[whichTimeout] =
+          setTimeout(this._timedOut(whichTimeout).bind(this), this.showTimeoutDelay);
+      }
+    },
+
+    _clearTimeout: function (whichTimeout) {
+      if (this._timeoutIds[whichTimeout] != null) {
+        clearTimeout(this._timeoutIds[whichTimeout]);
+      }
+    },
+
+    _timedOut: function (whichTimeout) {
+      var scope = this;
+      return function () {
+        if (scope.progress > 0.5) {
+          scope._setVisible(false);
+          scope.progress = 1;
+        } else {
+          scope._setVisible(true);
+          scope.progress = 0;
+        }
+      }
+    },
+
+    _setVisible: function (willBeVisible) {
+      console.log('setting visible:', willBeVisible);
+      if (willBeVisible) {
+        if (!(this.$.container.classList.contains('hidden') &&
+              !this.$.container.classList.contains('shown'))) {
+          Polymer.dom(this.$.container).classList.remove('hidden');
+          Polymer.dom(this.$.container).classList.add('shown');
+        }
+      } else {
+        if (!(!this.$.container.classList.contains('hidden') &&
+              this.$.container.classList.contains('shown'))) {
+          Polymer.dom(this.$.container).classList.remove('shown');
+          Polymer.dom(this.$.container).classList.add('hidden');
+        }
+      }
+    },
+
+    _setTween: function () {
+      Polymer.dom(this.$.container).classList.remove('shown');
+      Polymer.dom(this.$.container).classList.remove('hidden');
+    },
+
+    attached: function() {
+      // `attached` fires once the element and its parents have been inserted
+      // into a document.
+      //
+      // This is a good place to perform any work related to your element's
+      // visual state or active behavior (measuring sizes, beginning animations,
+      // loading resources, etc).
+    },
+
+    detached: function() {
+      // The analog to `attached`, `detached` fires when the element has been
+      // removed from a document.
+      //
+      // Use this to clean up anything you did in `attached`.
+    },
+
+    _getScrollTop: function () {
+      return (window.pageYOffset !== undefined)
+            ? window.pageYOffset
+            : (document.documentElement ||
+               document.body.parentNode ||
+               document.body).scrollTop;
+    },
+
+    _progressChanged: function () {
+      // console.log('progress is', this.progress);
+
+      // console.log('tweening');
+
+      // this._setTween();
+      // var transformAmount = -Math.floor(this.progress * 100) + "%";
+      // this.$.container.style['-webkit-transform'] = "translateY(" + transformAmount + ")";
+      // this.$.container.style['transform'] = "translateY(" + transformAmount + ")";
+    }
+
+  });
+
+</script>
