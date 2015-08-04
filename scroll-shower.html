@@ -131,10 +131,65 @@
       } else {
         this.progress = newProgress;
       }
-      this._startTimeout(whichWay);
+      if (whichWay == 'down') {
+        this.visible = false;
+      } else {
+        this.visible = true;
+      }
+      // this._startTimeout(whichWay);
     },
 
-    _timeoutIds: {}, // idk if this will be shared across instances?
+
+    _setVisible: function (willBeVisible) {
+      if (willBeVisible) {
+        Polymer.dom(this.$.container).classList.remove('hidden');
+        Polymer.dom(this.$.container).classList.add('shown');
+      } else {
+        Polymer.dom(this.$.container).classList.remove('shown');
+        Polymer.dom(this.$.container).classList.add('hidden');
+      }
+    },
+
+    _setTween: function () {
+      Polymer.dom(this.$.container).classList.remove('shown');
+      Polymer.dom(this.$.container).classList.remove('hidden');
+    },
+
+    attached: function() {
+      // `attached` fires once the element and its parents have been inserted
+      // into a document.
+      //
+      // This is a good place to perform any work related to your element's
+      // visual state or active behavior (measuring sizes, beginning animations,
+      // loading resources, etc).
+    },
+
+    detached: function() {
+      // The analog to `attached`, `detached` fires when the element has been
+      // removed from a document.
+      //
+      // Use this to clean up anything you did in `attached`.
+    },
+
+    _getScrollTop: function () {
+      return (window.pageYOffset !== undefined)
+            ? window.pageYOffset
+            : (document.documentElement ||
+               document.body.parentNode ||
+               document.body).scrollTop;
+    },
+
+    // --- Fancy methods that don't work and don't add that much --- //
+
+    _progressChanged: function () {
+      // -- this causes flickering and weirdness at top of page...
+      // this._setTween();
+      // var transformAmount = -Math.floor(this.progress * 100) + "%";
+      // this.$.container.style['-webkit-transform'] = "translateY(" + transformAmount + ")";
+      // this.$.container.style['transform'] = "translateY(" + transformAmount + ")";
+    },
+
+        _timeoutIds: {}, // idk if this will be shared across instances?
 
     _startTimeout: function (whichTimeout) {
       // this._setTween();
@@ -171,59 +226,6 @@
       }
     },
 
-    _setVisible: function (willBeVisible) {
-      console.log('willbevisible', willBeVisible);
-      if (willBeVisible) {
-        // if (!(this.$.container.classList.contains('hidden') &&
-        //       !this.$.container.classList.contains('shown'))) {
-          Polymer.dom(this.$.container).classList.remove('hidden');
-          Polymer.dom(this.$.container).classList.add('shown');
-        // }
-      } else {
-        // if (!(!this.$.container.classList.contains('hidden') &&
-        //       this.$.container.classList.contains('shown'))) {
-          Polymer.dom(this.$.container).classList.remove('shown');
-          Polymer.dom(this.$.container).classList.add('hidden');
-        // }
-      }
-    },
-
-    _setTween: function () {
-      Polymer.dom(this.$.container).classList.remove('shown');
-      Polymer.dom(this.$.container).classList.remove('hidden');
-    },
-
-    attached: function() {
-      // `attached` fires once the element and its parents have been inserted
-      // into a document.
-      //
-      // This is a good place to perform any work related to your element's
-      // visual state or active behavior (measuring sizes, beginning animations,
-      // loading resources, etc).
-    },
-
-    detached: function() {
-      // The analog to `attached`, `detached` fires when the element has been
-      // removed from a document.
-      //
-      // Use this to clean up anything you did in `attached`.
-    },
-
-    _getScrollTop: function () {
-      return (window.pageYOffset !== undefined)
-            ? window.pageYOffset
-            : (document.documentElement ||
-               document.body.parentNode ||
-               document.body).scrollTop;
-    },
-
-    _progressChanged: function () {
-      // -- this causes flickering and weirdness at top of page...
-      // this._setTween();
-      // var transformAmount = -Math.floor(this.progress * 100) + "%";
-      // this.$.container.style['-webkit-transform'] = "translateY(" + transformAmount + ")";
-      // this.$.container.style['transform'] = "translateY(" + transformAmount + ")";
-    }
 
   });
 
