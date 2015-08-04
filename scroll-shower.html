@@ -144,8 +144,8 @@
         // this._timeoutIds[whichTimeout] =
         //   setTimeout(this._timedOut(whichTimeout).bind(this), this.hideTimeoutDelay);
       } else {
-        this._timeoutIds[whichTimeout] =
-          setTimeout(this._timedOut(whichTimeout).bind(this), this.showTimeoutDelay);
+        // this._timeoutIds[whichTimeout] =
+          // setTimeout(this._timedOut(whichTimeout).bind(this), this.showTimeoutDelay);
       }
     },
 
@@ -156,18 +156,18 @@
     },
 
     _timedOut: function (whichTimeout) {
-      // var scope = this;
-      // return function () {
-      //   if (scope.progress > 0.5) {
-      //     // scope._setVisible(false);
-      //     scope.visible = false;
-      //     scope.progress = 1;
-      //   } else {
-      //     // scope._setVisible(true);
-      //     scope.visible = true;
-      //     scope.progress = 0;
-      //   }
-      // }
+      var scope = this;
+      return function () {
+        if (scope.progress > 0.5) {
+          // scope._setVisible(false);
+          scope.visible = false;
+          scope.progress = 1;
+        } else {
+          // scope._setVisible(true);
+          scope.visible = true;
+          scope.progress = 0;
+        }
+      }
     },
 
     _setVisible: function (willBeVisible) {
