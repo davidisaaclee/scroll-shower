@@ -76,6 +76,11 @@
       hideAtTop: {
         type: Boolean,
         value: true
+      },
+      visible: {
+        type: Boolean,
+        value: false,
+        observer: '_setVisible'
       }
     },
 
@@ -88,7 +93,8 @@
       //
       // This is the point where you should make modifications to the DOM (when
       // necessary), or kick off any processes the element wants to perform.
-      this._setVisible(false);
+      // this._setVisible(false);
+      this.visible = false;
       var previousPosition = this._getScrollTop();
       var scrollDelta = 0;
       var scope = this;
@@ -101,7 +107,8 @@
         if (scope.hideAtTop && (currentPosition < topThreshold)) {
           scope._clearTimeout('down');
           scope._clearTimeout('up');
-          scope._setVisible(false);
+          // scope._setVisible(false);
+          scope.visible = false;
           return;
         }
 
@@ -132,7 +139,8 @@
     _startTimeout: function (whichTimeout) {
       this._setTween();
       if (whichTimeout == 'down') {
-        this._setVisible(false);
+        // this._setVisible(false);
+        this.visible = false;
         // this._timeoutIds[whichTimeout] =
         //   setTimeout(this._timedOut(whichTimeout).bind(this), this.hideTimeoutDelay);
       } else {
@@ -151,10 +159,12 @@
       var scope = this;
       return function () {
         if (scope.progress > 0.5) {
-          scope._setVisible(false);
+          // scope._setVisible(false);
+          scope.visible = false;
           scope.progress = 1;
         } else {
-          scope._setVisible(true);
+          // scope._setVisible(true);
+          scope.visible = true;
           scope.progress = 0;
         }
       }
@@ -162,17 +172,17 @@
 
     _setVisible: function (willBeVisible) {
       if (willBeVisible) {
-        if (!(this.$.container.classList.contains('hidden') &&
-              !this.$.container.classList.contains('shown'))) {
+        // if (!(this.$.container.classList.contains('hidden') &&
+        //       !this.$.container.classList.contains('shown'))) {
           Polymer.dom(this.$.container).classList.remove('hidden');
           Polymer.dom(this.$.container).classList.add('shown');
-        }
+        // }
       } else {
-        if (!(!this.$.container.classList.contains('hidden') &&
-              this.$.container.classList.contains('shown'))) {
+        // if (!(!this.$.container.classList.contains('hidden') &&
+        //       this.$.container.classList.contains('shown'))) {
           Polymer.dom(this.$.container).classList.remove('shown');
           Polymer.dom(this.$.container).classList.add('hidden');
-        }
+        // }
       }
     },
 
